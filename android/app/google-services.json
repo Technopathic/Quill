@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_number": "608530873086",
+    "firebase_url": "https://quill-168218.firebaseio.com",
+    "project_id": "quill-168218",
+    "storage_bucket": "quill-168218.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:608530873086:android:7edbbe4ad3a676b8",
+        "android_client_info": {
+          "package_name": "com.quill"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "608530873086-o3jc2bod7bs1d8fslm3mtc9e0e1ggisa.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "608530873086-56o2hgve96iuqsshbqnqb714kt4f66vh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBMnHEJAG6MgwN7dX5q87XUENHMr8oTUA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "608530873086-o3jc2bod7bs1d8fslm3mtc9e0e1ggisa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
