@@ -357,7 +357,7 @@ class SignIn extends React.Component {
         </Header>
         <View style={backgroundContainer}>
           <Image style={logoContainer} source={require('../Images/quilllogo512.png')} />
-          <Text style={titleContainer}>Quill</Text>
+          <Text style={titleContainer}> Quill </Text>
 
           <View style={inputContainer}>
             <InputGroup borderType='underline' >

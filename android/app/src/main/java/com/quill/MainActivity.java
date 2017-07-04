@@ -1,4 +1,4 @@
-package com.quill;
+package com.quillapp;
 
 import com.facebook.react.ReactActivity;
 

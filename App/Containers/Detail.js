@@ -544,7 +544,7 @@ class Detail extends React.Component {
 
   optionReplyPanel = () => {
 
-    if(this.state.user.user.id == this.state.topic.userID || this.state.user.user.role == 1)
+    if(this.state.user.user.id == this.state.topic.userID &&| this.state.user.user.role == 1)
     {
       return (
         ActionSheet.show(
@@ -566,12 +566,12 @@ class Detail extends React.Component {
         )
       );
     }
-    else if(this.state.user.user.id != this.state.topic.userID || this.state.user.user.role == 1)
+    else if(this.state.user.user.id != this.state.topic.userID && this.state.user.user.role == 1)
     {
       return (
         ActionSheet.show(
         {
-          options: ['Report', 'Ban User'],
+          options: ['Report', 'Ban User', 'Delete'],
           cancelButtonIndex:4,
           title:'Options'
           },
@@ -653,6 +653,7 @@ class Detail extends React.Component {
         borderBottomWidth:1,
         borderBottomColor:'#FFFFFF',
         borderRadius:0,
+        padding:10,
         backgroundColor:'#6441a4',
         borderTopLeftRadius:5,
         borderBottomLeftRadius:5
@@ -709,6 +710,13 @@ class Detail extends React.Component {
     );
   }
 
+  renderMore = () => {
+    if(this.state.currentPage === this.state.lastPage) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   render() {
 
@@ -725,7 +733,10 @@ class Detail extends React.Component {
       textAlign:"center",
       fontSize:28,
       color:"#EEEEEE",
-      fontFamily:'Lobster-Regular'
+      fontFamily:'Lobster-Regular',
+      flex:1,
+      justifyContent:"center",
+      alignItems:"center"
     };
 
     const buttonStyleOne = {
@@ -756,9 +767,7 @@ class Detail extends React.Component {
                   <Icon name='chevron-left' size={35} style={{color:'#EEEEEE'}} />
                 </Button>
               </Left>
-              <Body>
-                <Text style={titleStyle}>{this.state.topic.topicTitle}</Text>
-              </Body>
+              <Text style={titleStyle} numberOfLines={1} ellipsizeMode="tail"> {this.state.topic.topicTitle} </Text>
               <Right style={{flex:1, flexDirection:'column'}}>
                 {this.optionPanel()}
               </Right>
@@ -769,7 +778,7 @@ class Detail extends React.Component {
               renderBubble={this.renderBubble}
               alwaysRenderAvatar={true}
               renderLoading={this.renderLoading}
-              loadEarlier={true}
+              loadEarlier={this.renderMore()}
               onLoadEarlier={this.getReplies}
             />
 

@@ -1,4 +1,4 @@
-package com.quill;
+package com.quillapp;
 
 import android.app.Application;
 import android.util.Log;
