@@ -5,7 +5,8 @@ Playing an online micro-fiction game has never been easier. Quill allows you to 
 Are you a fan of Dungeons & Dragons? Pathfinder? Then Quill is the right app for you! Enjoy RPGs and many other genres created by the community.
 
 ## Download
-[Android]()
+[Android](https://play.google.com/store/apps/details?id=com.quillapp&hl=en)
+
 iOS - Coming Soon
 
 ## Screenshots
