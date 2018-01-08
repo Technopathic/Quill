@@ -1,12 +1,15 @@
-# Quill
+![Banner](https://technopathic.me/storage/quillbanner2.png)
 
 Playing an online micro-fiction game has never been easier. Quill allows you to take your narrative fantasy games on the go. Host a game or join one, with Quill you can play at your own pace with real-time communication.
 
 Are you a fan of Dungeons & Dragons? Pathfinder? Then Quill is the right app for you! Enjoy RPGs and many other genres created by the community.
 
 ## Download
+[Android]()
+iOS - Coming Soon
 
 ## Screenshots
+![Screenshots](https://technopathic.me/storage/quillgithub.png)
 
 ## Requirements
 Before you get started developing with Quill, ensure you have the following:
@@ -50,7 +53,7 @@ php artisan serve --host=127.0.0.1 --port=8000
 ```
 
 ## Copyright / License
-Copyright 2017 Technopathic
+Copyright 2018 Technopathic
 Licensed under the GNU General Public License Version 3.0 (or later).
 
 ## Dedication
