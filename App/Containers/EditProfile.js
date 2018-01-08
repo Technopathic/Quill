@@ -23,10 +23,6 @@ class EditProfile extends React.Component {
      previewImg:"",
      profileName:"",
      profileDesc:"",
-     profileWebsite:"",
-     profileLocation:"",
-     newPassword:"",
-     confirmPassword:"",
      disableSubmit:false,
      showToast:false,
    };
@@ -74,8 +70,6 @@ class EditProfile extends React.Component {
          previewImg: json.user.avatar,
          profileName: json.profile.profileName,
          profileDesc: json.profile.profileDesc,
-         profileWebsite: json.profile.profileWebsite,
-         profileLocation: json.profile.profileLocation,
          isLoading:false
        })
      }
@@ -84,22 +78,17 @@ class EditProfile extends React.Component {
 
   handleProfileName = (event) => {this.setState({ profileName: event.nativeEvent.text })};
   handleProfileDesc = (event) => {this.setState({ profileDesc: event.nativeEvent.text })};
-  handleProfileWebsite = (event) => {this.setState({ profileWebsite: event.nativeEvent.text })};
-  handleProfileLocation = (event) => {this.setState({ profileLocation: event.nativeEvent.text })};
-  handleNewPassword = (event) => {this.setState({ newPassword: event.nativeEvent.text })};
-  handleConfirmPassword = (event) => {this.setState({ confirmPassword: event.nativeEvent.text })};
 
   updateProfile() {
     var _this = this;
 
+    this.setState({
+      isLoading:true
+    })
     var data = new FormData();
     data.append('avatar', this.state.avatar);
     data.append('profileName', this.state.profileName);
     data.append('profileDesc', this.state.profileDesc);
-    data.append('profileWebsite', this.state.profileWebsite);
-    data.append('profileLocation', this.state.profileLocation);
-    data.append('newPassword', this.state.newPassword);
-    data.append('confirmPassword', this.state.confirmPassword);
 
     fetch('http://quill.technopathic.me/api/updateProfile/'+this.props.uid+'?token=' + this.state.token, {
       method: 'POST',
@@ -114,11 +103,14 @@ class EditProfile extends React.Component {
       if(json.error)
       {
         _this.showToast('There was a problem updating.');
+        _this.setState({
+          isLoading:false
+        })
       }
       else if(json.success) {
         _this.setState({
           disableSubmit:true,
-
+          isLoading:false
         })
         _this.showToast('Profile Updated.');
         setTimeout(function(){NavigationActions.pop()}, 2000);
@@ -137,10 +129,12 @@ class EditProfile extends React.Component {
 
     ImagePicker.showImagePicker(options, (response) => {
       let source = { uri: response.uri };
-      this.setState({
-        avatar: response.data,
-        previewImg: 'data:image/jpeg;base64,' + response.data
-      });
+      if(response.data !== undefined) {
+        this.setState({
+          avatar: response.data,
+          previewImg: 'data:image/jpeg;base64,' + response.data
+        });
+      }
     });
   };
 
@@ -284,14 +278,6 @@ class EditProfile extends React.Component {
             <Item>
               <Icon active name='person' style={{fontSize:22, paddingLeft:5, paddingRight:5}} />
               <Input placeholder='Bio' style={descBody} value={this.state.profileDesc} onChange={this.handleProfileDesc} selectionColor="#6441A4" underlineColorAndroid="#6441A4"/>
-            </Item>
-            <Item>
-              <Icon active name='web' style={{fontSize:22, paddingLeft:5, paddingRight:5}} />
-              <Input placeholder='New Password' style={descBody} value={this.state.newPassword} onChange={this.handleNewPassword} selectionColor="#6441A4" underlineColorAndroid="#6441A4"/>
-            </Item>
-            <Item>
-              <Icon active name='web' style={{fontSize:22, paddingLeft:5, paddingRight:5}} />
-              <Input placeholder='Confirm Password' style={descBody} value={this.state.confirmPassword} onChange={this.handleConfirmPassword} selectionColor="#6441A4" underlineColorAndroid="#6441A4"/>
             </Item>
           </View>
           <Button block style={buttonStyleOne} onPress={() => this.updateProfile()}><Text>Update</Text></Button>

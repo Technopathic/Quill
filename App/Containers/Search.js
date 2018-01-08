@@ -182,7 +182,7 @@ class Search extends React.Component {
   shareText = (topic) => {
     Share.share({
       message: topic.topicBody,
-      url: 'http://quill.technopathic.me/share/'+topic.id,
+      url: '',
       title: topic.topicTitle
     }, {
       dialogTitle: 'Share this Topic',
@@ -465,7 +465,7 @@ class Search extends React.Component {
                   <Icon name="search" size={20} style={iconStyle}/>
                   <Text style={{fontSize:14, fontFamily:'Lato-Regular'}}>{tag.tagName}</Text>
                   <Right>
-                    <Badge success>
+                    <Badge style={{backgroundColor:'#6441A4'}}>
                         <Text>{tag.tagCount}</Text>
                     </Badge>
                   </Right>

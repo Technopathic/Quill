@@ -117,7 +117,7 @@ class CreateTopic extends React.Component {
     }
     if(dup === true)
     {
-      _this.showToast('You cannot add this tag again.');
+      this.showToast('You cannot add this tag again.');
     }
     else {
       tags.push(tag);

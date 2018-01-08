@@ -8,6 +8,8 @@ import { Header, Container, Content, Card, CardItem, Left, Body, Right, Thumbnai
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
+import OneSignal from 'react-native-onesignal';
+
 // Styles
 import styles from './Styles/HomeStyle'
 
@@ -50,6 +52,9 @@ export default class Home extends React.Component {
     });
   };
 
+  componentWillUnmount() {
+    OneSignal.removeEventListener('ids');
+  }
 
   getTopics = () => {
     var nextPage = this.state.nextPage;
@@ -66,7 +71,10 @@ export default class Home extends React.Component {
        })
        .then(function(json) {
         if(json.error) {
-          NavigationActions.signin();
+          OneSignal.addEventListener('ids', function(device) {
+            AsyncStorage.setItem('uuid', device.userId);
+            NavigationActions.signin();
+          })
         }
         else {
           if(json.current_page !== json.last_page)
@@ -164,7 +172,7 @@ export default class Home extends React.Component {
  shareText = (topic) => {
    Share.share({
      message: topic.topicBody,
-     url: 'http://quill.technopathic.me/share/'+topic.id,
+     url:'' ,
      title: topic.topicTitle
    }, {
      dialogTitle: 'Share this Topic',
@@ -231,13 +239,13 @@ export default class Home extends React.Component {
     else if(status === 'Closed')
     {
       return(
-        <Text style={{color:'red'}}>{status}</Text>
+        <Text style={{color:'red'}}>Ongoing</Text>
       )
     }
     else if(status === 'Complete')
     {
       return(
-        <Text style={{color:'blue'}}>{status}</Text>
+        <Text style={{color:'blue'}}>Done</Text>
       )
     }
   }
@@ -326,25 +334,29 @@ export default class Home extends React.Component {
     };
 
     var joinButton = <Button style={{backgroundColor:"#6441A4", flex:1, justifyContent:'center', borderRadius:0}} onPress={() => this.joinGame(topic.id)}><Text style={{color:"#FFFFFF"}}>JOIN</Text></Button>;
-    if(topic.userID == this.state.user.user.id)
+    if(topic.userID == this.state.user.user.id && topic.gameCount < topic.topicMembers)
     {
       joinButton = <Button style={{backgroundColor:"#02bb75", flex:1, justifyContent:'center', borderRadius:0}} onPress={() => {NavigationActions.detail({id:topic.id})}}><Text style={{color:"#FFFFFF"}}>HOST</Text></Button>;
     }
-    else if(topic.topicStatus === "Closed" && topic.topicGame === 0 && topic.userID !== this.state.user.user.id)
+    else if(topic.topicStatus === "Closed" && topic.topicGame === 0 && topic.userID !== this.state.user.user.id && topic.gameCount < topic.topicMembers)
     {
-      joinButton = <Button style={{backgroundColor:"#9f162b", flex:1, justifyContent:'center', borderRadius:0}} onPress={() => {NavigationActions.detail({id:topic.id})}}><Text style={{color:"#FFFFFF"}}>CLOSED</Text></Button>;
+      joinButton = <Button style={{backgroundColor:"#9f162b", flex:1, justifyContent:'center', borderRadius:0}} onPress={() => {NavigationActions.detail({id:topic.id})}}><Text style={{color:"#FFFFFF"}}>ONGOING</Text></Button>;
     }
-    else if(topic.topicStatus === "Complete" && topic.topicGame === 0 && topic.userID !== this.state.user.user.id)
+    else if(topic.topicStatus === "Complete" && topic.topicGame === 0 && topic.userID !== this.state.user.user.id && topic.gameCount < topic.topicMembers)
     {
-      joinButton = <Button style={{backgroundColor:"#0f568f", flex:1, justifyContent:'center', borderRadius:0}} onPress={() => {NavigationActions.detail({id:topic.id})}}><Text style={{color:"#FFFFFF"}}>COMPLETE</Text></Button>;
+      joinButton = <Button style={{backgroundColor:"#0f568f", flex:1, justifyContent:'center', borderRadius:0}} onPress={() => {NavigationActions.detail({id:topic.id})}}><Text style={{color:"#FFFFFF"}}>DONE</Text></Button>;
     }
-    else if(topic.topicStatus === "Open" && topic.topicGame === 1 && topic.userID !== this.state.user.user.id)
+    else if(topic.topicStatus === "Open" && topic.topicGame === 1 && topic.userID !== this.state.user.user.id && topic.gameCount < topic.topicMembers)
     {
       joinButton = <Button style={{backgroundColor:"#02bb75", flex:1, justifyContent:'center', borderRadius:0}} onPress={() => {NavigationActions.detail({id:topic.id})}}><Text style={{color:"#FFFFFF"}}>JOINED</Text></Button>;
     }
-    else if(topic.topicStatus === "Complete" && topic.topicGame === 1 && topic.userID !== this.state.user.user.id)
+    else if(topic.topicStatus === "Complete" && topic.topicGame === 1 && topic.userID !== this.state.user.user.id && topic.gameCount < topic.topicMembers)
     {
       joinButton = <Button style={{backgroundColor:"#02bb75", flex:1, justifyContent:'center', borderRadius:0}} onPress={() => {NavigationActions.detail({id:topic.id})}}><Text style={{color:"#FFFFFF"}}>JOINED</Text></Button>;
+    }
+    else if(topic.gameCount == topic.topicMembers)
+    {
+      joinButton = <Button style={{backgroundColor:"#9f162b", flex:1, justifyContent:'center', borderRadius:0}} onPress={() => {NavigationActions.detail({id:topic.id})}}><Text style={{color:"#FFFFFF"}}>FULL</Text></Button>;
     }
 
     return(
@@ -363,7 +375,7 @@ export default class Home extends React.Component {
         </View>
         <View style={{paddingLeft:10, paddingRight:10}}>
           <Text style={smallText} onPress={() => {NavigationActions.detail({id:topic.id})}}>
-            {topic.topicReplies} Replies &middot; {this.renderStatus(topic.topicStatus)}
+            {topic.gameCount}/{topic.topicMembers} &middot; {this.renderStatus(topic.topicStatus)}
           </Text>
         </View>
         <View style={optionStyle}>

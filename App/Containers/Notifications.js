@@ -192,7 +192,7 @@ class Notifications extends React.Component {
           <Thumbnail source={{uri:notif.avatar}}  onPress={() => {NavigationActions.profile({uid:notif.peerID})}}/>
           <Body onPress={() => {NavigationActions.detail({id:topic.id})}}>
             <Text>{notif.name}</Text>
-            <Text note>Has replied to your topic.</Text>
+            <Text note>Has replied to {notif.topicTitle}.</Text>
           </Body>
           <Right>
             <Button transparent>

@@ -28,7 +28,7 @@ class Detail extends React.Component {
       replyBody:"",
       replyMentions:[],
       selectReply:0,
-      shareOpen: false,
+      selectUser:0,
       nextPage:1,
       currentPage:0,
       lastPage:1,
@@ -40,7 +40,8 @@ class Detail extends React.Component {
       replyModal: false,
       reportReplyModal: false,
       deleteReplyModal: false,
-      showToast:false,
+      banUserModal:false,
+      showToast:false
     };
   };
 
@@ -53,6 +54,11 @@ class Detail extends React.Component {
     });
   };
 
+  navigateBack = () => {
+    pusher.unsubscribe('topic_'+this.props.id);
+    NavigationActions.pop({refresh: {index:0}})
+  }
+
   async componentWillMount() {
     await AsyncStorage.multiGet(["token", "user"], (err, stores) => {
      stores.map((result, i, store) => {
@@ -63,11 +69,10 @@ class Detail extends React.Component {
      });
    })
    .then(() => {
-     this.channel = pusher.subscribe('topic-'+this.props.id);
+     this.channel = pusher.subscribe('topic_'+this.props.id);
      this.channel.bind('replySend', this.updateChat);
      this.getTopic();
      this.getReplies();
-     //this.getReplies();
     })
   };
 
@@ -141,10 +146,6 @@ class Detail extends React.Component {
       {
         _this.showToast(json.error);
       }
-      else if(json.success)
-      {
-        //_this.showToast(json.success);
-      }
     });
   };
 
@@ -157,19 +158,13 @@ class Detail extends React.Component {
     });
   }
 
-  handleShareOpen = () => {
-    this.setState({shareOpen: true});
-  };
-
-  handleShareClose = () => {
-    this.setState({shareOpen: false});
-  };
-
   showReport(visible) { this.setState({optionsModal:false, reportModal: visible}); }
   showDelete(visible) { this.setState({optionsModal:false, deleteModal: visible}); }
 
   showReplyReport(visible) { this.setState({replyModal:false, reportReplyModal: visible}); }
   showReplyDelete(visible) { this.setState({replyModal:false, deleteReplyModal: visible}); }
+
+  showBanUser(visible) { this.setState({replyModal:false, banUserModal: visible}); }
 
   deleteTopic() {
     var _this = this;
@@ -363,9 +358,33 @@ class Detail extends React.Component {
         }
         else if(json === 1)
         {
-          _this.showReplyDelete(!this.state.deleteReplyModal);
+          _this.showReplyDelete(!_this.state.deleteReplyModal);
           _this.showToast('Reply was deleted.');
         }
+      }
+    });
+  };
+
+  banUser(id) {
+    var _this = this;
+
+    fetch('http://quill.technopathic.me/api/gameban/'+id+'?token=' + this.state.token, {
+      method: 'POST',
+      headers:{
+        'Authorization': 'Bearer ' + this.state.token
+      }
+    }).then(function(response) {
+        return response.json()
+    })
+    .then(function(json) {
+      if(json.error)
+      {
+        _this.showToast(json.error);
+      }
+      else if(json.success)
+      {
+        _this.showBanUser(!_this.state.banUserModal);
+        _this.showToast(json.success);
       }
     });
   }
@@ -393,12 +412,12 @@ class Detail extends React.Component {
         }
         else if(json === 1)
         {
-          _this.showReplyReport(!this.state.reportReplyModal);
+          _this.showReplyReport(!_this.state.reportReplyModal);
           _this.showToast('Reply was reported.');
         }
         else if(json === 2)
         {
-          _this.showReplyReport(!this.state.reportReplyModal);
+          _this.showReplyReport(!_this.state.reportReplyModal);
           _this.showToast('You cannot report yourself.');
         }
       }
@@ -544,7 +563,7 @@ class Detail extends React.Component {
 
   optionReplyPanel = () => {
 
-    if(this.state.user.user.id == this.state.topic.userID &&| this.state.user.user.role == 1)
+    if(this.state.user.user.id == this.state.topic.userID && this.state.user.user.role == 1)
     {
       return (
         ActionSheet.show(
@@ -560,7 +579,7 @@ class Detail extends React.Component {
             }
             else if(buttonIndex == 1)
             {
-              this.showBanUser(!this.state.banUserModel);
+              this.showBanUser(!this.state.banUserModal);
             }
           }
         )
@@ -582,7 +601,7 @@ class Detail extends React.Component {
             }
             else if(buttonIndex == 1)
             {
-              this.showBanUser(!this.state.banUserModel);
+              this.showBanUser(!this.state.banUserModal);
             }
             else if(buttonIndex == 2)
             {
@@ -681,7 +700,8 @@ class Detail extends React.Component {
           touchableProps={{
             onPress: () => {
               this.setState({
-                selectReply:props.currentMessage._id
+                selectReply:props.currentMessage._id,
+                selectUser:props.currentMessage.user._id
               });
               this.optionReplyPanel()
             }
@@ -763,7 +783,7 @@ class Detail extends React.Component {
             <Header style={appBar}>
               <StatusBar backgroundColor="#6441A4" barStyle='light-content' />
               <Left>
-                <Button transparent onPress={() => NavigationActions.pop({refresh: {index:0}})}>
+                <Button transparent onPress={() => this.navigateBack()}>
                   <Icon name='chevron-left' size={35} style={{color:'#EEEEEE'}} />
                 </Button>
               </Left>
@@ -804,7 +824,7 @@ class Detail extends React.Component {
             <View style={{padding:15}}>
               <Text style={{fontFamily:'Lato-Regular', fontSize:14, color:'#555555'}}>Are you sure you want to report this reply?</Text>
 
-              <Button block style={buttonStyleOne} onPress={() => this.reportReply()}><Text>Confirm</Text></Button>
+              <Button block style={buttonStyleOne} onPress={() => this.reportReply(this.state.selectReply)}><Text>Confirm</Text></Button>
               <Button block style={buttonStyleTwo} textStyle={styles.textStyleTwo} onPress={() => { this.showReplyReport(!this.state.reportReplyModal)}}><Text>Cancel</Text></Button>
             </View>
           </Modal>
@@ -813,10 +833,20 @@ class Detail extends React.Component {
             <View style={{padding:15}}>
               <Text style={{fontFamily:'Lato-Regular', fontSize:14, color:'#555555'}}>Are you sure you want to delete this reply?</Text>
 
-              <Button block style={buttonStyleOne} onPress={() => this.deleteReply()}><Text>Confirm</Text></Button>
+              <Button block style={buttonStyleOne} onPress={() => this.deleteReply(this.state.selectReply)}><Text>Confirm</Text></Button>
               <Button block style={buttonStyleTwo} textStyle={styles.textStyleTwo} onPress={() => { this.showReplyDelete(!this.state.deleteReplyModal)}}><Text>Cancel</Text></Button>
             </View>
           </Modal>
+
+          <Modal animationType={"slide"} transparent={false} visible={this.state.banUserModal}  onRequestClose={() => {}}>
+            <View style={{padding:15}}>
+              <Text style={{fontFamily:'Lato-Regular', fontSize:14, color:'#555555'}}>Are you sure you want to ban this user?</Text>
+
+              <Button block style={buttonStyleOne} onPress={() => this.banUser(this.state.selectUser)}><Text>Confirm</Text></Button>
+              <Button block style={buttonStyleTwo} textStyle={styles.textStyleTwo} onPress={() => { this.showBanUser(!this.state.banUserModal)}}><Text>Cancel</Text></Button>
+            </View>
+          </Modal>
+
         </Container>
       );
     }

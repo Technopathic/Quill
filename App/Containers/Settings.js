@@ -1,7 +1,7 @@
 // @flow
 
 import React from 'react'
-import { ScrollView, AsyncStorage, StatusBar, View, Image, Switch, Dimensions, TouchableOpacity } from 'react-native'
+import { ScrollView, AsyncStorage, Linking, StatusBar, View, Image, Switch, Dimensions, TouchableOpacity } from 'react-native'
 import { Actions as NavigationActions } from 'react-native-router-flux'
 
 import { Container, Header, Content, List, ListItem, Text, Button, Right, Left, Body, Toast, Spinner } from 'native-base'
@@ -114,10 +114,13 @@ class Settings extends React.Component {
   signOut = () => {
     AsyncStorage.removeItem("token");
     AsyncStorage.removeItem("user");
-    this.showToast('Good-Bye!.');
+    this.showToast('Good-Bye!');
     NavigationActions.signin();
   };
 
+  getWebsite = (url) => {
+    Linking.openURL(url).catch(err => console.error('An error occurred', err));
+  };
 
   render () {
 
@@ -251,7 +254,7 @@ class Settings extends React.Component {
       return (
         <View style={spinnerStyle}>
           <StatusBar backgroundColor="#6441A4" barStyle='light-content' />
-          <Spinner/>
+          <Spinner color="#6441A4"/>
         </View>
       )
     }
@@ -270,37 +273,34 @@ class Settings extends React.Component {
             </Body>
           </Header>
           <Content style={{padding:10}}>
-            <View style={inputRow}>
-              <Text style={settingTitle}>Show Notifcations on Votes</Text>
-              <Switch onValueChange={(value) => this.setState({notiVote: value}).then(() => { this.updateSettings(); })} value={this.state.notiVote} />
-            </View>
-            <View style={inputRowTwo}>
-              <Text style={settingTitle}>Show Notifcations on Replies</Text>
-              <Switch onValueChange={(value) => this.setState({notiReply: value}).then(() => { this.updateSettings(); })} value={this.state.notiReply} />
-            </View>
-            <View style={inputRowTwo}>
-              <Text style={settingTitle}>Show Notifcations on Mentions</Text>
-              <Switch onValueChange={(value) => this.setState({notiMention: value}).then(() => { this.updateSettings(); })} value={this.state.notiMention} />
-            </View>
-            <View style={inputRowTwo}>
-              <Text style={settingTitle}>Private Profile</Text>
-              <Switch onValueChange={(value) => this.setState({profPrivate: value}).then(() => { this.updateSettings(); })} value={this.state.profPrivate} />
-            </View>
-            <View style={inputRowTwo}>
-              <Text> </Text>
-            </View>
-            <View style={inputRowTwo}>
-              <Text style={settingTitle}>Blog</Text>
-            </View>
-            <View style={inputRowTwo}>
-              <Text style={settingTitle}>Privacy Policy</Text>
-            </View>
-            <View style={inputRowTwo}>
-              <Text style={settingTitle}>Terms of Service</Text>
-            </View>
-            <TouchableOpacity style={inputRowTwo} onPress={() => this.signOut()}>
-              <Text style={settingTitle}>Log Out</Text>
-            </TouchableOpacity>
+            <List>
+              <ListItem style={inputRow}>
+                <Text style={settingTitle}>Show Notifcations on Votes</Text>
+                <Switch onValueChange={(value) => this.setState({notiVote: value}, function(){this.updateSettings();}) } value={this.state.notiVote} />
+              </ListItem>
+              <ListItem style={inputRowTwo}>
+                <Text style={settingTitle}>Show Notifcations on Replies</Text>
+                <Switch onValueChange={(value) => this.setState({notiReply: value}, function(){this.updateSettings();}) } value={this.state.notiReply} />
+              </ListItem>
+              <ListItem style={inputRowTwo}>
+                <Text style={settingTitle}>Show Notifcations on Mentions</Text>
+                <Switch onValueChange={(value) => this.setState({notiMention: value}, function(){this.updateSettings();}) } value={this.state.notiMention} />
+              </ListItem>
+            </List>
+            <List>
+              <ListItem style={inputRowTwo} onPress={() => this.getWebsite('http://technopathic.me/quill')}>
+                <Text style={settingTitle}>Website</Text>
+              </ListItem>
+              <ListItem style={inputRowTwo} onPress={() => this.getWebsite('http://quill.technopathic.me/quill-privacy.html')}>
+                <Text style={settingTitle}>Privacy Policy</Text>
+              </ListItem>
+              <ListItem style={inputRowTwo} onPress={() => this.getWebsite('http://quill.technopathic.me/quill-tos.html')}>
+                <Text style={settingTitle}>Terms of Service</Text>
+              </ListItem>
+              <ListItem style={inputRowTwo} onPress={() => this.signOut()}>
+                <Text style={settingTitle}>Log Out</Text>
+              </ListItem>
+            </List>
           </Content>
         </ScrollView>
       )

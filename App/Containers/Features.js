@@ -18,7 +18,6 @@ class Features extends React.Component {
       topics: [],
       token: "",
       follows: [],
-      shareOpen: false,
       nextPage:1,
       currentPage:0,
       lastPage:1,
@@ -93,14 +92,6 @@ class Features extends React.Component {
          }
        }.bind(this));
      }
-  };
-
-  handleShareOpen = () => {
-    this.setState({shareOpen: true});
-  };
-
-  handleShareClose = () => {
-    this.setState({shareOpen: false});
   };
 
   voteTopic(id, dir) {
@@ -219,7 +210,7 @@ class Features extends React.Component {
   shareText = (topic) => {
     Share.share({
       message: topic.topicBody,
-      url: 'http://brag.technopathic.me/share/'+topic.id,
+      url: '',
       title: topic.topicTitle
     }, {
       dialogTitle: 'Share this Topic',
@@ -289,41 +280,38 @@ class Features extends React.Component {
   };
 
   renderSuggests()
-  {
-    const followStyle = {
-      flex:1,
-      flexDirection:"row",
-      padding:15,
-    };
+{
+  const followStyle = {
+    flex:1,
+    flexDirection:"row",
+    paddingTop:15,
+    paddingLeft:15,
+    borderBottomWidth:1,
+    borderBottomColor:'#EEEEEE',
+    maxHeight:80,
+  };
 
-    const followBox = {
-      marginRight:20,
-      flex:1,
-      flexDirection:"column",
-    };
+  const followName = {
+    width:60,
+    color:"#333333",
+    textAlign:'center',
+    fontFamily:'Montserrat-Regular',
+    fontSize:12
+  };
 
-    const followName = {
-      width:60,
-      color:"#333333",
-      textAlign:'center',
-      fontFamily:'Montserrat-Regular',
-      fontSize:12
-    };
-
-    if(this.state.follows.length !== 0)
-    return(
-      <ScrollView horizontal={true} style={followStyle}>
-        {this.state.follows.map((follow, i) => (
-          <TouchableHighlight style={followBox} key={i} onPress={() => {NavigationActions.profile({uid:follow.id})}} underlayColor='#FFFFFF'>
-            <View>
-              <Thumbnail size={80} source={{uri:follow.avatar}}/>
-              <Text style={followName}>{follow.name}</Text>
-            </View>
-          </TouchableHighlight>
-        ))}
-      </ScrollView>
-    );
-  }
+  if(this.state.follows.length !== 0)
+  return(
+    <ScrollView horizontal={true} style={followStyle}>
+      {this.state.follows.map((follow, i) => (
+        <TouchableHighlight style={{marginRight:20}} key={i} onPress={() => {NavigationActions.profile({uid:follow.id})}} underlayColor='#FFFFFF'>
+          <View style={{flex:1, flexDirection:'column'}}>
+            <Thumbnail size={80} source={{uri:follow.avatar}} style={{borderWidth:3, borderColor:'#6441A4'}}/>
+          </View>
+        </TouchableHighlight>
+      ))}
+    </ScrollView>
+  );
+}
 
   renderTopics = (topic) => {
     var topic = topic.item;
@@ -466,7 +454,6 @@ class Features extends React.Component {
           </Header>
           {this.renderSuggests()}
           <FlatList
-            style={{borderTopWidth:1, borderTopColor:'#EEEEEE'}}
             data={this.state.topics}
             keyExtractor={(topic, index) => index}
             renderItem={this.renderTopics}

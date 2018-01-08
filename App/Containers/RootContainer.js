@@ -20,7 +20,7 @@ class RootContainer extends Component {
 
     this.state = {
       selectedIndex:0,
-      user:""
+      user:"",
     };
   };
 

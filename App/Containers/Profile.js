@@ -4,7 +4,7 @@ import React from 'react'
 import { ScrollView, StatusBar, AsyncStorage, View, Image, Modal, Dimensions, TouchableHighlight } from 'react-native'
 import { Actions as NavigationActions } from 'react-native-router-flux'
 
-import { Container, Header, Content, Card, CardItem, Thumbnail, List, ListItem, Text, Button, Right, Left, Body, ActionSheet, Toast, Spinner } from 'native-base'
+import { Container, Header, Content, Card, CardItem, Thumbnail, List, ListItem, Text, Button, Right, Left, Body, ActionSheet, Toast, Spinner, Badge } from 'native-base'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Styles
@@ -24,6 +24,7 @@ class Profile extends React.Component {
      isProfileLoading:true,
      isTopicsLoading:true,
      isRepliesLoading:true,
+     isNotifsLoading:true,
      showToast:false,
      nextPage:1,
      currentPage:0,
@@ -58,6 +59,7 @@ showReport(visible) { this.setState({ reportOpen: visible}); }
   })
   .then(() => {
      this.getProfile();
+     this.getNotifs();
      this.getTopics();
      this.getReplies();
    })
@@ -159,6 +161,29 @@ showReport(visible) { this.setState({ reportOpen: visible}); }
     }
  };
 
+ getNotifs = () => {
+   fetch('http://quill.technopathic.me/api/getNotifCount?token='+this.state.token, {
+     headers:{
+       'Authorization': 'Bearer ' + this.state.token
+     }
+   })
+   .then(function(response) {
+     return response.json()
+   })
+   .catch((error) => console.warn("fetch error:", error))
+   .then(function(json) {
+     if(json.error === "token_not_provided")
+     {
+        //NavigationActions.signin();
+     }
+     else {
+       this.setState({
+         notifs: json,
+         isNotifsLoading:false
+       })
+     }
+   }.bind(this))
+ };
 
  reportProfile() {
     var _this = this;
@@ -380,10 +405,16 @@ showReport(visible) { this.setState({ reportOpen: visible}); }
 
     if(this.state.user.user.id === this.props.uid)
     {
+      var showNotif = <Badge style={{backgroundColor:'#6441A4', marginLeft:-10, marginTop:3}}><Text>{this.state.notifs}</Text></Badge>;
+      if(this.state.notifs === 0)
+      {
+        showNotif = <Text> </Text>;
+      }
       return(
         <Left style={leftNav}>
           <Button transparent onPress={() => NavigationActions.notifications()}>
             <Icon name='notifications' size={25} style={{color:'#EEEEEE'}} />
+            {showNotif}
           </Button>
         </Left>
       );
@@ -837,7 +868,7 @@ showReport(visible) { this.setState({ reportOpen: visible}); }
       alignItems:'center'
     };
 
-    if (this.state.isProfileLoading || this.state.isTopicsLoading || this.state.isRepliesLoading) {
+    if (this.state.isProfileLoading || this.state.isTopicsLoading || this.state.isRepliesLoading || this.state.isNotifsLoading) {
       return (
         <View style={spinnerStyle}>
           <StatusBar backgroundColor="#6441A4" barStyle='light-content' />
