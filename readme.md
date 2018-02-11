@@ -7,7 +7,7 @@ Are you a fan of Dungeons & Dragons? Pathfinder? Then Quill is the right app for
 ## Download
 [Android](https://play.google.com/store/apps/details?id=com.quillapp&hl=en)
 
-iOS - Coming Soon
+[iOS](https://itunes.apple.com/us/app/quill-nanofiction/id1332561909?ls=1&mt=8)
 
 ## Screenshots
 ![Screenshots](https://technopathic.me/storage/quillgithub.png)
