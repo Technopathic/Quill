@@ -52,8 +52,17 @@ export default class Home extends React.Component {
     });
   };
 
-  componentWillUnmount() {
-    OneSignal.removeEventListener('ids');
+  checkID = () => {
+    OneSignal.getPermissionSubscriptionState((device) => {
+      if(device.userId != null) {
+        AsyncStorage.setItem('uuid', device.userId)
+        .then(() => {
+          NavigationActions.signin();
+        })
+      } else {
+        this.checkID();
+      }
+    });
   }
 
   getTopics = () => {
@@ -70,11 +79,8 @@ export default class Home extends React.Component {
          return response.json()
        })
        .then(function(json) {
-        if(json.error) {
-          OneSignal.addEventListener('ids', function(device) {
-            AsyncStorage.setItem('uuid', device.userId);
-            NavigationActions.signin();
-          })
+        if(json.error || !this.state.user) {
+         this.checkID();
         }
         else {
           if(json.current_page !== json.last_page)
